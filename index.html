@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>World of White</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Comic Sans MS', cursive;
+      background: white;
+      color: black;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      overflow: hidden;
+      text-align: center;
+      transition: background 1s;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+    }
+
+    .stars {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+
+    button {
+      font-size: 1.2rem;
+      padding: 10px 20px;
+      margin: 10px;
+      border-radius: 15px;
+      border: none;
+      background-color: #e0e0e0;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #cccccc;
+    }
+
+    #startScreen, #choiceScreen, #flourScreen, #mixScreen, #endScreen, #lightScreen, #milkScreen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    img.icon {
+      width: 120px;
+      cursor: pointer;
+    }
+
+    .drag-area {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .target {
+      width: 160px;
+      height: 120px;
+      border: 2px dashed #aaa;
+      border-radius: 10px;
+      line-height: 120px;
+      font-size: 1.2rem;
+      color: #888;
+      background: #f0f8ff;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="startScreen">
+    <div class="stars">★ ✦ ✧ ✦ ★ ✦ ✧ ✦ ★</div>
+    <h1>World of White</h1>
+    <div class="stars">★ ✦ ✧ ✦ ★ ✦ ✧ ✦ ★</div>
+    <button onclick="showChoices()">Play</button>
+  </div>
+
+  <div id="choiceScreen">
+    <h2>Pilih salah satu:</h2>
+    <button onclick="startFlour()">Flour</button>
+    <button onclick="startLight()">Light</button>
+    <button onclick="startMilk()">Milk</button>
+  </div>
+
+  <div id="flourScreen">
+    <h2>Pencet 3×</h2>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/5d/Flour_scoop.jpg" class="icon" onclick="tapFlour()" />
+  </div>
+
+  <div id="mixScreen">
+    <h2>Campurkan tepung dan air ke dalam mangkuk.</h2>
+    <div class="drag-area">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/5/5d/Flour_scoop.jpg" class="icon" draggable="true" id="flourDrag" />
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/25/Glass_of_Water.JPG" class="icon" draggable="true" id="waterDrag" />
+      <img src="https://upload.wikimedia.org/wikipedia/commons/8/8a/Blue_bowl.jpg" class="icon" id="bowl" />
+    </div>
+    <div class="target" ondragover="allowDrop(event)" ondrop="drop(event)">Drop here</div>
+  </div>
+
+  <div id="lightScreen">
+    <h2>🌞 Cahaya terang menyinari dunia putih...</h2>
+    <p>Awan-awan mulai menari di langit.</p>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Sun_symbol.svg/240px-Sun_symbol.svg.png" class="icon" />
+    <button onclick="endGame()">Lanjut</button>
+  </div>
+
+  <div id="milkScreen">
+    <h2>🥛 Kamu memilih susu segar!</h2>
+    <p>Seekor sapi lucu muncul dan berkata Moo~</p>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Milk_glass.jpg/220px-Milk_glass.jpg" class="icon" />
+    <button onclick="endGame()">Lanjut</button>
+  </div>
+
+  <div id="endScreen">
+    <h2>Thank you for playing 🎀</h2>
+    <p>𒉽𒆗𒉽𒆗𒉽𒆗 Sampai jumpa di dunia putih selanjutnya!</p>
+  </div>
+
+  <script>
+    let flourTaps = 0;
+    let dropped = [];
+
+    function hideAll() {
+      document.querySelectorAll('div[id$="Screen"]').forEach(d => d.style.display = 'none');
+    }
+
+    function showChoices() {
+      hideAll();
+      document.body.style.background = '#fff';
+      document.getElementById('choiceScreen').style.display = 'flex';
+    }
+
+    function startFlour() {
+      hideAll();
+      document.body.style.background = '#fdf6e3';
+      document.getElementById('flourScreen').style.display = 'flex';
+    }
+
+    function tapFlour() {
+      flourTaps++;
+      if (flourTaps === 3) {
+        startMixing();
+      }
+    }
+
+    function startMixing() {
+      hideAll();
+      document.body.style.background = 'orange';
+      document.getElementById('mixScreen').style.display = 'flex';
+    }
+
+    function allowDrop(ev) {
+      ev.preventDefault();
+    }
+
+    function drop(ev) {
+      ev.preventDefault();
+      const id = ev.dataTransfer.getData("text");
+      if (!dropped.includes(id)) {
+        dropped.push(id);
+      }
+      if (dropped.includes("flourDrag") && dropped.includes("waterDrag")) {
+        setTimeout(() => {
+          hideAll();
+          document.body.style.background = '#fff';
+          document.getElementById('endScreen').style.display = 'flex';
+        }, 1000);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      document.querySelectorAll('[draggable=true]').forEach(el => {
+        el.addEventListener("dragstart", ev => {
+          ev.dataTransfer.setData("text", ev.target.id);
+        });
+      });
+      document.getElementById('startScreen').style.display = 'flex';
+    });
+
+    function startLight() {
+      hideAll();
+      document.body.style.background = '#f0f8ff';
+      document.getElementById('lightScreen').style.display = 'flex';
+    }
+
+    function startMilk() {
+      hideAll();
+      document.body.style.background = '#fffaf0';
+      document.getElementById('milkScreen').style.display = 'flex';
+    }
+
+    function endGame() {
+      hideAll();
+      document.body.style.background = '#ffffff';
+      document.getElementById('endScreen').style.display = 'flex';
+    }
+  </script>
+</body>
+</html>
